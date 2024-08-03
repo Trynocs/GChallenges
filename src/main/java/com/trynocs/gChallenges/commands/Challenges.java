@@ -11,11 +11,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
 @CommandAlias("challenges")
 @CommandPermission("trynocs.challenges")
-public class Challenges extends BaseCommand {
+public class Challenges extends BaseCommand implements Listener {
 
     @Default
     public void execute(CommandSender sender, String[] args) {
@@ -39,10 +42,15 @@ public class Challenges extends BaseCommand {
         if (sender instanceof Player player) {
             Inventory inventory = Bukkit.createInventory(null, 9*6, main.prefix + "§5Challenges Menu");
             for (int i= 0; i < inventory.getSize(); i++) {
-                inventory.setItem(i, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setName("§7").build());
+                inventory.setItem(i, new ItemBuilder(Material.IRON_NUGGET).setCustomModelData(1).setName("§7").build());
             }
 
             player.openInventory(inventory);
         }
+    }
+
+    @EventHandler
+    public void onClick(InventoryClickEvent event) {
+        event.setCancelled(true);
     }
 }

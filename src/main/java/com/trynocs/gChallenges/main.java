@@ -3,6 +3,7 @@ package com.trynocs.gChallenges;
 import co.aikar.commands.PaperCommandManager;
 import com.trynocs.gChallenges.commands.Challenges;
 import com.trynocs.gChallenges.utils.config.Configmanager;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -39,6 +40,7 @@ public final class main extends JavaPlugin {
         configManager.saveDefaultConfig();
         loadConfigValues();
         registerCommands();
+        Bukkit.getServer().setMotd(main.prefix + "Version: " + getDescription().getVersion() + "\n" + "§bBy Trynocs");
 
         getLogger().info("Plugin wurde aktiviert.");
     }
