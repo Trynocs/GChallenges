@@ -5,6 +5,7 @@ import com.trynocs.gChallenges.commands.Challenges;
 import com.trynocs.gChallenges.listener.ConnectionListener;
 import com.trynocs.gChallenges.listener.InventoryListener;
 import com.trynocs.gChallenges.listener.WalkListener;
+import com.trynocs.gChallenges.utils.challenge.AmpelChanger;
 import com.trynocs.gChallenges.utils.config.Configmanager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -26,6 +27,7 @@ public final class main extends JavaPlugin {
     private Configmanager configManager;
     private PaperCommandManager commandManager;
     private PluginManager pluginManager;
+    private AmpelChanger ampelChanger;
 
     @Override
     public void onEnable() {
@@ -35,6 +37,7 @@ public final class main extends JavaPlugin {
         commandManager = new PaperCommandManager(this);
         configManager = new Configmanager(this);
         configManager.saveDefaultConfig();
+        ampelChanger = new AmpelChanger(this);
         pluginManager = main.getPlugin().getServer().getPluginManager();
         loadConfigValues();
         registerCommands();
@@ -49,10 +52,14 @@ public final class main extends JavaPlugin {
     private void registerCommands() {
         Challenges challenges = new Challenges();
         commandManager.registerCommand(challenges);
+
     }
 
     @Override
     public void onDisable() {
+        if (ampelChanger != null) {
+            ampelChanger.stopTask();
+        }
         getLogger().info("Plugin wurde deaktiviert");
     }
 

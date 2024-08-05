@@ -7,14 +7,18 @@ import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
 import com.trynocs.gChallenges.main;
 import com.trynocs.gChallenges.utils.ItemBuilder;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +31,8 @@ import java.util.logging.Logger;
 @CommandPermission("trynocs.challenges")
 public class Challenges extends BaseCommand implements Listener {
 
+    private BukkitRunnable runnable;
+    private int time;
     private static final Logger LOGGER = main.getPlugin().getLogger();
 
     @Default
@@ -54,6 +60,7 @@ public class Challenges extends BaseCommand implements Listener {
                 inventory.setItem(i, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setCustomModelData(1).setName("§7").build());
             }
             inventory.setItem(10, new ItemBuilder(Material.BEACON).setName("§bAmpel Challenge").setLocalizedName("ampel-challenge").setLore("§8» §7In der Ampel-Challenge gibt es eine Bossbar in der eine Farbe angezeigt wird.", "§8» Kurz gesagt: Lauf bei Rot, du bist Tod.", "Klicken zum Spielen!").build());
+            inventory.setItem(40, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setName("§8» §5Einstellungen").setLocalizedName("settings").setCustomModelData(3).build());
             player.openInventory(inventory);
         }
     }
@@ -131,6 +138,33 @@ public class Challenges extends BaseCommand implements Listener {
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "restart");
     }
 
+    @Subcommand("timer start")
+    @CommandPermission("trynocs.challenges.timer.start")
+    private void timer(CommandSender sender, String[] args) {
+        runnable  = new BukkitRunnable() {
+            @Override
+            public void run() {
+                Bukkit.getOnlinePlayers().forEach(player -> {
+                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(main.prefix + "§aTimer: " + shortInteger(time)));
+                });
+                time++;
+            }
+        };
+        runnable.runTaskTimer(main.getPlugin(), 0, 20);
+    }
+
+    @Subcommand("timer stop")
+    @CommandPermission("trynocs.challenges.timer.stop")
+    private void stopTimer(CommandSender sender) {
+        if (runnable != null && !runnable.isCancelled()) {
+            runnable.cancel();
+            Bukkit.broadcastMessage(main.prefix + "§cTimer wurde von §5" + sender.getName() + " §cgestoppt.");
+            LOGGER.info("Timer wurde gestoppt.");
+        } else {
+            sender.sendMessage(main.prefix + "§cDer Timer läuft nicht oder wurde bereits gestoppt.");
+        }
+    }
+
     private void deleteWorldFolder(Path path) throws IOException {
         if (Files.isDirectory(path)) {
             Files.list(path).forEach(file -> {
@@ -142,5 +176,50 @@ public class Challenges extends BaseCommand implements Listener {
             });
         }
         Files.delete(path);
+    }
+    public static String shortInteger(int duration) {
+        String string = "";
+
+        int hours = 0;
+        int minutes = 0;
+        int seconds = 0;
+
+        if (duration / 60 / 60 >= 1) {
+            hours = duration / 60 / 60;
+            duration = duration - ((duration / 60 / 60) * 60 * 60);
+        }
+
+        if (duration / 60 >= 1) {
+            minutes = duration / 60;
+            duration = duration - ((duration / 60) * 60);
+        }
+
+        if (duration >= 1) {
+            seconds = duration;
+        }
+
+
+        if (hours <= 9) {
+            string = string + "0" + hours + ":";
+        } else {
+            string = string + hours + ":";
+        }
+
+
+        if (minutes <= 9) {
+            string = string + "0" + minutes + ":";
+        } else {
+            string = string + minutes + ":";
+        }
+
+
+        if (seconds <= 9) {
+            string = string + "0" + seconds;
+        } else {
+            string = string + seconds;
+        }
+
+        return string;
+
     }
 }

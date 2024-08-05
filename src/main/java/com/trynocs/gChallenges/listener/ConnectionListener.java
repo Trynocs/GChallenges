@@ -13,7 +13,7 @@ import java.net.URL;
 public class ConnectionListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        event.getPlayer().setResourcePack("https://download.mc-packs.net/pack/e29cfd0e18293e3741dc184d6434f48fb31dd62c.zip");
+        event.getPlayer().setResourcePack("https://download.mc-packs.net/pack/3aa556ba78807626e375d43b64fc56df6c27abb5.zip");
         event.setJoinMessage(main.prefix + ChatColor.GOLD + event.getPlayer().getName() + " §ahat den Server betreten.");
     }
     @EventHandler
