@@ -2,6 +2,9 @@ package com.trynocs.gChallenges;
 
 import co.aikar.commands.PaperCommandManager;
 import com.trynocs.gChallenges.commands.Challenges;
+import com.trynocs.gChallenges.listener.ConnectionListener;
+import com.trynocs.gChallenges.listener.InventoryListener;
+import com.trynocs.gChallenges.listener.WalkListener;
 import com.trynocs.gChallenges.utils.config.Configmanager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -29,24 +32,23 @@ public final class main extends JavaPlugin {
         getLogger().info("Plugin wird aktiviert...");
         plugin = this;
 
-        if (pluginManager.getPlugin("PlaceholderAPI") == null) {
-            getLogger().severe("PlaceholderAPI nicht gefunden! Dieses Plugin wird deaktiviert!");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-
         commandManager = new PaperCommandManager(this);
         configManager = new Configmanager(this);
         configManager.saveDefaultConfig();
+        pluginManager = main.getPlugin().getServer().getPluginManager();
         loadConfigValues();
         registerCommands();
+        pluginManager.registerEvents(new ConnectionListener(), this);
+        pluginManager.registerEvents(new WalkListener(), this);
+        pluginManager.registerEvents(new InventoryListener(), this);
         Bukkit.getServer().setMotd(main.prefix + "Version: " + getDescription().getVersion() + "\n" + "§bBy Trynocs");
 
         getLogger().info("Plugin wurde aktiviert.");
     }
 
     private void registerCommands() {
-        commandManager.registerCommand(new Challenges());
+        Challenges challenges = new Challenges();
+        commandManager.registerCommand(challenges);
     }
 
     @Override

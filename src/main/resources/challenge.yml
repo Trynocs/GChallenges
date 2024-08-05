@@ -1,0 +1,5 @@
+settings:
+  kill-all: true
+ampel-challenge:
+  enabled: true
+  color: green

@@ -9,16 +9,25 @@ import com.trynocs.gChallenges.main;
 import com.trynocs.gChallenges.utils.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Random;
+import java.util.logging.Logger;
 
 @CommandAlias("challenges")
 @CommandPermission("trynocs.challenges")
 public class Challenges extends BaseCommand implements Listener {
+
+    private static final Logger LOGGER = main.getPlugin().getLogger();
 
     @Default
     public void execute(CommandSender sender, String[] args) {
@@ -40,17 +49,98 @@ public class Challenges extends BaseCommand implements Listener {
     @CommandPermission("trynocs.challenges.menu")
     public void menu(CommandSender sender, String[] args) {
         if (sender instanceof Player player) {
-            Inventory inventory = Bukkit.createInventory(null, 9*6, main.prefix + "§5Challenges Menu");
-            for (int i= 0; i < inventory.getSize(); i++) {
-                inventory.setItem(i, new ItemBuilder(Material.IRON_NUGGET).setCustomModelData(1).setName("§7").build());
+            Inventory inventory = Bukkit.createInventory(null, 9 * 6, "§6Challenges Menu §8» §bMain");
+            for (int i = 0; i < inventory.getSize(); i++) {
+                inventory.setItem(i, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setCustomModelData(1).setName("§7").build());
             }
-
+            inventory.setItem(10, new ItemBuilder(Material.BEACON).setName("§bAmpel Challenge").setLocalizedName("ampel-challenge").setLore("§8» §7In der Ampel-Challenge gibt es eine Bossbar in der eine Farbe angezeigt wird.", "§8» Kurz gesagt: Lauf bei Rot, du bist Tod.", "Klicken zum Spielen!").build());
             player.openInventory(inventory);
         }
     }
 
-    @EventHandler
-    public void onClick(InventoryClickEvent event) {
-        event.setCancelled(true);
+    @Subcommand("reset")
+    @CommandPermission("trynocs.challenges.reset")
+    public void onReset(CommandSender sender) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            player.kickPlayer(main.prefix + "§cDie Welten werden zurückgesetzt, bitte warte einen Moment.");
+        }
+
+        // Warte 5 Sekunden, damit die Spieler gekickt werden können
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        String[] worldNames = {"world", "world_nether", "world_the_end"};
+        for (String worldName : worldNames) {
+            World world = Bukkit.getWorld(worldName);
+            if (world == null) {
+                LOGGER.info("Welt " + worldName + " wurde nicht gefunden.");
+                continue;
+            }
+
+            File worldFolder = world.getWorldFolder();
+            LOGGER.info("Setze Welt zurück: " + worldName);
+
+            // Welt entladen, mit wiederholtem Versuch
+            boolean isUnloaded = false;
+            while (!isUnloaded) {
+                isUnloaded = Bukkit.unloadWorld(world, false);
+                if (!isUnloaded) {
+                    LOGGER.info("Fehler beim Entladen der Welt: " + worldName + ". Versuche es erneut...");
+                    try {
+                        Thread.sleep(5000); // Warte 5 Sekunden und versuche es erneut
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            // Weltverzeichnis löschen
+            try {
+                deleteWorldFolder(worldFolder.toPath());
+            } catch (IOException e) {
+                LOGGER.info("Fehler beim Löschen des Weltverzeichnisses: " + e.getMessage());
+                continue;
+            }
+
+            // Neuen Seed generieren
+            long newSeed = new Random().nextLong();
+            WorldCreator creator = new WorldCreator(worldName).seed(newSeed);
+
+            // Neue Welt erstellen
+            World newWorld = Bukkit.createWorld(creator);
+            if (newWorld != null) {
+                LOGGER.info(main.prefix + "Welt " + worldName + " wurde mit einem neuen zufälligen Seed zurückgesetzt. Seed: " + newSeed);
+            } else {
+                LOGGER.info("Fehler beim Erstellen der Welt: " + worldName);
+            }
+        }
+
+        // Spieler teleportieren und Nachricht senden
+        World overworld = Bukkit.getWorld("world");
+        if (overworld != null) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.teleport(overworld.getSpawnLocation());
+                player.sendMessage(main.prefix + "§aDie Welten wurden zurückgesetzt.");
+            }
+        }
+
+        // Server neustarten
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "restart");
+    }
+
+    private void deleteWorldFolder(Path path) throws IOException {
+        if (Files.isDirectory(path)) {
+            Files.list(path).forEach(file -> {
+                try {
+                    deleteWorldFolder(file);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        Files.delete(path);
     }
 }
