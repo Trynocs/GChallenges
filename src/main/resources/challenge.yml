@@ -1,5 +1,8 @@
 settings:
   kill-all: true
+timer:
+  time: 0
+  paused: false
 ampel-challenge:
   enabled: false
   color: green

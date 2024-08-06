@@ -13,7 +13,7 @@ public class WalkListener implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         FileConfiguration challenge = main.getPlugin().getConfigManager().getCustomConfig("challenge");
-        if (challenge.getString("ampel-challenge.enabled").equals("true") && challenge.getString("ampel-challenge.color").equals("red")) {
+        if (challenge.getString("ampel-challenge.enabled").equals("true") && challenge.getString("ampel-challenge.color").equals("red") && challenge.getString("timer.paused").equals("false")) {
             if (challenge.getString("settings.kill-all").equals("true")) {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     if (player.getGameMode() != GameMode.SPECTATOR)  {

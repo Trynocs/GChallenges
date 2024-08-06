@@ -11,20 +11,16 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Item;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Random;
 import java.util.logging.Logger;
 
 @CommandAlias("challenges")
@@ -59,109 +55,77 @@ public class Challenges extends BaseCommand implements Listener {
             for (int i = 0; i < inventory.getSize(); i++) {
                 inventory.setItem(i, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setCustomModelData(1).setName("§7").build());
             }
-            inventory.setItem(10, new ItemBuilder(Material.BEACON).setName("§bAmpel Challenge").setLocalizedName("ampel-challenge").setLore("§8» §7In der Ampel-Challenge gibt es eine Bossbar in der eine Farbe angezeigt wird.", "§8» Kurz gesagt: Lauf bei Rot, du bist Tod.", "Klicken zum Spielen!").build());
+            inventory.setItem(10, new ItemBuilder(Material.BEACON).setName("§bAmpel Challenge").setLocalizedName("ampel-challenge").setLore("§8» §7In der Ampel-Challenge gibt es eine Bossbar in der eine Farbe angezeigt wird.", "§8» Kurz gesagt: Lauf bei Rot, du bist Tod.", "§5Klicken zum Spielen!").build());
             inventory.setItem(40, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setName("§8» §5Einstellungen").setLocalizedName("settings").setCustomModelData(3).build());
             player.openInventory(inventory);
         }
     }
 
-    @Subcommand("reset")
-    @CommandPermission("trynocs.challenges.reset")
-    public void onReset(CommandSender sender) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            player.kickPlayer(main.prefix + "§cDie Welten werden zurückgesetzt, bitte warte einen Moment.");
-        }
-
-        // Warte 5 Sekunden, damit die Spieler gekickt werden können
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        String[] worldNames = {"world", "world_nether", "world_the_end"};
-        for (String worldName : worldNames) {
-            World world = Bukkit.getWorld(worldName);
-            if (world == null) {
-                LOGGER.info("Welt " + worldName + " wurde nicht gefunden.");
-                continue;
-            }
-
-            File worldFolder = world.getWorldFolder();
-            LOGGER.info("Setze Welt zurück: " + worldName);
-
-            // Welt entladen, mit wiederholtem Versuch
-            boolean isUnloaded = false;
-            while (!isUnloaded) {
-                isUnloaded = Bukkit.unloadWorld(world, false);
-                if (!isUnloaded) {
-                    LOGGER.info("Fehler beim Entladen der Welt: " + worldName + ". Versuche es erneut...");
-                    try {
-                        Thread.sleep(5000); // Warte 5 Sekunden und versuche es erneut
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            // Weltverzeichnis löschen
-            try {
-                deleteWorldFolder(worldFolder.toPath());
-            } catch (IOException e) {
-                LOGGER.info("Fehler beim Löschen des Weltverzeichnisses: " + e.getMessage());
-                continue;
-            }
-
-            // Neuen Seed generieren
-            long newSeed = new Random().nextLong();
-            WorldCreator creator = new WorldCreator(worldName).seed(newSeed);
-
-            // Neue Welt erstellen
-            World newWorld = Bukkit.createWorld(creator);
-            if (newWorld != null) {
-                LOGGER.info(main.prefix + "Welt " + worldName + " wurde mit einem neuen zufälligen Seed zurückgesetzt. Seed: " + newSeed);
-            } else {
-                LOGGER.info("Fehler beim Erstellen der Welt: " + worldName);
-            }
-        }
-
-        // Spieler teleportieren und Nachricht senden
-        World overworld = Bukkit.getWorld("world");
-        if (overworld != null) {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                player.teleport(overworld.getSpawnLocation());
-                player.sendMessage(main.prefix + "§aDie Welten wurden zurückgesetzt.");
-            }
-        }
-
-        // Server neustarten
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "restart");
-    }
-
     @Subcommand("timer start")
     @CommandPermission("trynocs.challenges.timer.start")
     private void timer(CommandSender sender, String[] args) {
-        runnable  = new BukkitRunnable() {
+        FileConfiguration challenge = main.getPlugin().getConfigManager().getCustomConfig("challenge");
+        time = challenge.getInt("timer.time", 0); // Initialize the time variable
+
+        runnable = new BukkitRunnable() {
             @Override
             public void run() {
+                time++;
+                challenge.set("timer.time", time);
+                main.getPlugin().getConfigManager().saveCustomConfig("challenge");
+
                 Bukkit.getOnlinePlayers().forEach(player -> {
                     player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(main.prefix + "§aTimer: " + shortInteger(time)));
                 });
-                time++;
             }
         };
         runnable.runTaskTimer(main.getPlugin(), 0, 20);
+        challenge.set("timer.paused", false);
+        main.getPlugin().getConfigManager().saveCustomConfig("challenge");
     }
 
-    @Subcommand("timer stop")
-    @CommandPermission("trynocs.challenges.timer.stop")
+    @Subcommand("timer pause")
+    @CommandPermission("trynocs.challenges.timer.pause")
     private void stopTimer(CommandSender sender) {
         if (runnable != null && !runnable.isCancelled()) {
             runnable.cancel();
-            Bukkit.broadcastMessage(main.prefix + "§cTimer wurde von §5" + sender.getName() + " §cgestoppt.");
-            LOGGER.info("Timer wurde gestoppt.");
+            FileConfiguration challenge = main.getPlugin().getConfigManager().getCustomConfig("challenge");
+            challenge.set("timer.paused", true);
+            challenge.set("timer.time", time);
+            main.getPlugin().getConfigManager().saveCustomConfig("challenge");
+            Bukkit.broadcastMessage(main.prefix + "§cTimer wurde von §5" + sender.getName() + " §cpausiert.");
+            LOGGER.info("Timer wurde pausiert.");
         } else {
-            sender.sendMessage(main.prefix + "§cDer Timer läuft nicht oder wurde bereits gestoppt.");
+            sender.sendMessage(main.prefix + "Der Timer läuft nicht oder wurde bereits gestoppt.");
+        }
+    }
+
+    @Subcommand("timer resume")
+    @CommandPermission("trynocs.challenges.timer.resume")
+    public void resumeTimer(CommandSender sender) {
+        if (runnable == null || runnable.isCancelled()) {
+            FileConfiguration challenge = main.getPlugin().getConfigManager().getCustomConfig("challenge");
+            time = challenge.getInt("timer.time", 0); // Initialize the time variable
+
+            runnable = new BukkitRunnable() {
+                @Override
+                public void run() {
+                    time++;
+                    challenge.set("timer.time", time);
+                    main.getPlugin().getConfigManager().saveCustomConfig("challenge");
+
+                    Bukkit.getOnlinePlayers().forEach(player -> {
+                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(main.prefix + "§aTimer: " + shortInteger(time)));
+                    });
+                }
+            };
+            runnable.runTaskTimer(main.getPlugin(), 0, 20);
+            challenge.set("timer.paused", false);
+            main.getPlugin().getConfigManager().saveCustomConfig("challenge");
+            Bukkit.broadcastMessage(main.prefix + "§aTimer wurde von §5" + sender.getName() + " §afortgesetzt.");
+            LOGGER.info("Timer wurde fortgesetzt.");
+        } else {
+            sender.sendMessage(main.prefix + "Der Timer läuft bereits.");
         }
     }
 
@@ -177,6 +141,7 @@ public class Challenges extends BaseCommand implements Listener {
         }
         Files.delete(path);
     }
+
     public static String shortInteger(int duration) {
         String string = "";
 
@@ -198,20 +163,17 @@ public class Challenges extends BaseCommand implements Listener {
             seconds = duration;
         }
 
-
         if (hours <= 9) {
             string = string + "0" + hours + ":";
         } else {
             string = string + hours + ":";
         }
 
-
         if (minutes <= 9) {
             string = string + "0" + minutes + ":";
         } else {
             string = string + minutes + ":";
         }
-
 
         if (seconds <= 9) {
             string = string + "0" + seconds;
@@ -220,6 +182,5 @@ public class Challenges extends BaseCommand implements Listener {
         }
 
         return string;
-
     }
 }
