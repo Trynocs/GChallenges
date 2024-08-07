@@ -61,6 +61,9 @@ public class InventoryListener implements Listener {
                             for (Player players : Bukkit.getOnlinePlayers()) {
                                 players.sendTitle("§b" + player.getName() + " §7hat die Ampel Challenge gestartet!", "", 0, 100, 0);
                             }
+                            if (challenge.getString("level-border.enabled").equals("true")) {
+                                challenge.set("level-border.enabled", "false");
+                            }
                         }
                         break;
                     case "settings":
