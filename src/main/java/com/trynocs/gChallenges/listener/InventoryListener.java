@@ -34,6 +34,7 @@ public class InventoryListener implements Listener {
         FileConfiguration challenge = main.getPlugin().getConfigManager().getCustomConfig("challenge");
         if (event.getCurrentItem() == null) return;
         if (event.getView().getTitle().equals("§6Challenges Menu §8» §bMain") || event.getView().getTitle().equals("§6Challenges Menu §8» §bSettings")) {
+            event.setCancelled(true);
             Player player = (Player) event.getWhoClicked();
             if (event.getCurrentItem().getItemMeta().hasLocalizedName()) {
                 switch (event.getCurrentItem().getItemMeta().getLocalizedName()) {
@@ -135,7 +136,8 @@ public class InventoryListener implements Listener {
                             challenge.set("level-border.enabled", "true");
                             challenge.set("level-border.blocks", 1);
                             challenge.set("timer.time", time);
-                            Location location = main.getPlugin().getLevelUpLocationManager().getLocationConfigByName(player.getWorld().getName());
+                            main.getPlugin().getLevelUpLocationManager().setLocationConfig(player.getWorld().getName(), player.getWorld().getWorldBorder().getCenter());
+                            Location location = main.getPlugin().getLevelUpLocationManager().getLocationConfig(player.getWorld().getName());
                             main.getPlugin().getLevelUpListener().worldBorder.setSize(1);
                             main.getPlugin().getLevelUpListener().worldBorder_nether.setSize(1);
                             main.getPlugin().getLevelUpListener().worldBorder_the_end.setSize(1);
