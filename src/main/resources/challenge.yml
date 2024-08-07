@@ -1,6 +1,6 @@
 settings:
   kill-all: true
-  normal-death-end: true
+  normal-death-end: false
 timer:
   time: 0
   paused: false
