@@ -136,7 +136,6 @@ public class InventoryListener implements Listener {
                             challenge.set("level-border.enabled", "true");
                             challenge.set("level-border.blocks", 1);
                             challenge.set("timer.time", time);
-                            main.getPlugin().getLevelUpLocationManager().setLocationConfig(player.getWorld().getName(), player.getWorld().getWorldBorder().getCenter());
                             Location location = main.getPlugin().getLevelUpLocationManager().getLocationConfig(player.getWorld().getName());
                             main.getPlugin().getLevelUpListener().worldBorder.setSize(1);
                             main.getPlugin().getLevelUpListener().worldBorder_nether.setSize(1);

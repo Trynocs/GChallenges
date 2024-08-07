@@ -48,6 +48,7 @@ public final class main extends JavaPlugin {
         levelUpListener = new LevelUpListener();
         levelUpLocationManager = new LevelUpLocationManager();
         pluginManager = main.getPlugin().getServer().getPluginManager();
+        main.getPlugin().getLevelUpLocationManager().setLocationConfig("world", Bukkit.getWorlds().get(0).getSpawnLocation());
         loadConfigValues();
         registerCommands();
         pluginManager.registerEvents(new ConnectionListener(), this);

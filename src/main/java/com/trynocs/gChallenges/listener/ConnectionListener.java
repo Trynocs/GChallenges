@@ -18,8 +18,8 @@ public class ConnectionListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         FileConfiguration challenge = main.getPlugin().getConfigManager().getCustomConfig("challenge");
-        event.getPlayer().setResourcePack("https://download.mc-packs.net/pack/3aa556ba78807626e375d43b64fc56df6c27abb5.zip");
-        event.setJoinMessage(main.prefix + ChatColor.GOLD + event.getPlayer().getName() + " §ahat den Server betreten.");
+        event.getPlayer().setResourcePack("https://download.mc-packs.net/pack/f88bc41507eefe4752e15532a70fffd12228989a.zip");
+        event.setJoinMessage(main.prefix + ChatColor.AQUA + event.getPlayer().getName() + " §ahat den Server betreten.");
         if (challenge.get("ampel-challenge.enabled").equals("true")) {
             BossBar bar = Bukkit.getBossBar(NamespacedKey.minecraft("ampel_bossbar"));
             bar.addPlayer(event.getPlayer());
@@ -27,6 +27,6 @@ public class ConnectionListener implements Listener {
     }
     @EventHandler
     public void onLeave(PlayerQuitEvent event) {
-        event.setQuitMessage(main.prefix + ChatColor.GRAY + event.getPlayer().getName() + " hat den Server verlassen.");
+        event.setQuitMessage(main.prefix + event.getPlayer().getName() + " hat den Server verlassen.");
     }
 }

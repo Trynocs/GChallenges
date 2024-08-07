@@ -39,7 +39,7 @@ public class LevelUpListener implements Listener {
     @EventHandler
     public void onLevelUp(PlayerLevelChangeEvent event) {
         if (challenge.getString("level-border.enabled").equals("true")) {
-            if (event.getOldLevel() < event.getNewLevel() && challenge.getString("level-border.enabled").equals("true") && challenge.getString("timer.pause").equals("false")) {
+            if (event.getOldLevel() < event.getNewLevel() && challenge.getString("level-border.enabled").equals("true") && challenge.getString("timer.paused").equals("false")) {
                 World world = Bukkit.getWorld("world");
                 World world_nether = Bukkit.getWorld("world_nether");
                 World world_the_end = Bukkit.getWorld("world_the_end");
