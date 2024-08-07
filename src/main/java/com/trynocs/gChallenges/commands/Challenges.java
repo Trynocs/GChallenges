@@ -57,14 +57,14 @@ public class Challenges extends BaseCommand implements Listener {
                 inventory.setItem(i, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setCustomModelData(1).setName("§7").build());
             }
             if (challenge.getString("ampel-challenge.enabled").equals("true")) {
-                inventory.setItem(10, new ItemBuilder(Material.BEACON).setName("§2A§em§cp§2e§el §cC§2h§ea§cl§2l§ee§cn§2g§ee").setLocalizedName("ampel-challenge").setLore("§7", "§8» §aAktiv.", "§7", "§8» §7In der Ampel-Challenge gibt es eine Bossbar in der eine Farbe angezeigt wird.", "§8» Kurz gesagt: Lauf bei Rot, du bist Tod.", "§7", "§8» §aKlicken zum Spielen!").build());
+                inventory.setItem(10, new ItemBuilder(Material.BEACON).setName("§2A§em§cp§2e§el §cC§2h§ea§cl§2l§ee§cn§2g§ee").setLocalizedName("ampel-challenge").setLore("§7", "§8» §aAktiv.", "§7", "§8» §7In der Ampel-Challenge gibt es eine Bossbar in der eine Farbe angezeigt wird.", "§8» §7Kurz gesagt: Lauf bei §cRot§f, und du bist §4Tod§7.", "§7", "§8» §aKlicken zum Spielen!").build());
             }else {
                 inventory.setItem(10, new ItemBuilder(Material.BEACON).setName("§2A§em§cp§2e§el §cC§2h§ea§cl§2l§ee§cn§2g§ee").setLocalizedName("ampel-challenge").setLore("§7", "§8» §cInaktiv.", "§7", "§8» §7In der Ampel-Challenge gibt es eine Bossbar in der eine Farbe angezeigt wird.", "§8» Kurz gesagt: Lauf bei Rot, du bist Tod.", "§7", "§8» §aKlicken zum Spielen!").build());
             }
             if (challenge.getString("level-border.enabled").equals("true")) {
-                inventory.setItem(12, new ItemBuilder(Material.EXPERIENCE_BOTTLE).setName("§eLevel = Border").setLocalizedName("border").setLore("§7", "§8» §aAktiv.", "§7", "§8» §7In Level = Border wird die Border so groß wie dein Erfahrungs-Level ist.", "§8» §7z.b. bei Level 100 ist die Border 100x100 blöcke groß.", "§7", "§8» §aKlicken zum Spielen!").build());
+                inventory.setItem(12, new ItemBuilder(Material.EXPERIENCE_BOTTLE).setName("§eLevel = Border").setLocalizedName("border").setLore("§7", "§8» §aAktiv.", "§7", "§8» §7In Level = Border wird die Border so groß wie dein Erfahrungs-Level ist.", "§8» §7z.b. bei Level 100 ist die Border 100x100 Blöcke groß.", "§7", "§8» §aKlicken zum Spielen!").build());
             }else {
-                inventory.setItem(12, new ItemBuilder(Material.EXPERIENCE_BOTTLE).setName("§eLevel = Border").setLocalizedName("border").setLore("§7", "§8» §cInaktiv.", "§7", "§8» §7In Level = Border wird die Border so groß wie dein Erfahrungs-Level ist.", "§8» §7z.b. bei Level 100 ist die Border 100x100 blöcke groß.", "§7", "§8» §aKlicken zum Spielen!").build());
+                inventory.setItem(12, new ItemBuilder(Material.EXPERIENCE_BOTTLE).setName("§eLevel = Border").setLocalizedName("border").setLore("§7", "§8» §cInaktiv.", "§7", "§8» §7In Level = Border wird die Border so groß wie dein Erfahrungs-Level ist.", "§8» §7z.b. bei Level 100 ist die Border 100x100 Blöcke groß.", "§7", "§8» §aKlicken zum Spielen!").build());
             }
             inventory.setItem(40, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setName("§8» §5Einstellungen").setLocalizedName("settings").setCustomModelData(3).build());
             player.openInventory(inventory);
