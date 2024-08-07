@@ -1,8 +1,12 @@
 settings:
   kill-all: true
+  normal-death-end: true
 timer:
   time: 0
   paused: false
 ampel-challenge:
   enabled: false
   color: green
+level-border:
+  enabled: false
+  blocks: 1

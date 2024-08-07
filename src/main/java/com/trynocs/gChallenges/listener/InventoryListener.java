@@ -6,6 +6,7 @@ import com.trynocs.gChallenges.utils.challenge.AmpelChanger;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.boss.BarColor;
@@ -26,7 +27,6 @@ public class InventoryListener implements Listener {
     // Constructor to load the saved time
     public InventoryListener() {
         FileConfiguration challenge = main.getPlugin().getConfigManager().getCustomConfig("challenge");
-        this.time = challenge.getInt("ampel-challenge.timer", 0); // Load saved time or 0 if not present
     }
 
     @EventHandler
@@ -46,14 +46,20 @@ public class InventoryListener implements Listener {
                             challenge.set("timer.time", 0);
                             Bukkit.getBossBar(NamespacedKey.minecraft("ampel_bossbar")).removeAll();
                             main.getPlugin().getConfigManager().saveCustomConfig("challenge");
+                            for (Player players : Bukkit.getOnlinePlayers()) {
+                                players.sendTitle("§b" + player.getName() + " §7hat die Ampel Challenge beendet!", "", 0, 100, 0);
+                            }
                         } else {
                             AmpelChanger ampelChanger = new AmpelChanger(main.getPlugin());
-                            Bukkit.broadcastMessage(main.prefix + "§6" + player.getName() + " §7hat die Ampel Challenge gestartet!");
-                            challenge.set("ampel-challenge.enabled", true);
+                            Bukkit.broadcastMessage(main.prefix + "§b" + player.getName() + " §7hat die Ampel Challenge gestartet!");
+                            challenge.set("ampel-challenge.enabled", "true");
                             challenge.set("ampel-challenge.color", "green");
                             challenge.set("timer.time", time);
                             ampelChanger.setColor("green"); // Set initial color and start task
                             main.getPlugin().getConfigManager().saveCustomConfig("challenge");
+                            for (Player players : Bukkit.getOnlinePlayers()) {
+                                players.sendTitle("§b" + player.getName() + " §7hat die Ampel Challenge gestartet!", "", 0, 100, 0);
+                            }
                         }
                         break;
                     case "settings":
@@ -62,7 +68,16 @@ public class InventoryListener implements Listener {
                         for (int i = 0; i < inventory.getSize(); i++) {
                             inventory.setItem(i, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setCustomModelData(1).setName("§7").build());
                         }
-                        inventory.setItem(10, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setLocalizedName("killall").setCustomModelData(2).setName("§8» §cKill-All").build());
+                        if (challenge.getString("settings.kill-all").equals("true")) {
+                            inventory.setItem(10, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setLocalizedName("killall").setCustomModelData(2).setName("§8» §cKill-All").setLore("§7", "§8» §aAktiviert.", "§7", "§8» §7Einer für alle und alle für einen.").build());
+                        }else {
+                            inventory.setItem(10, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setLocalizedName("killall").setCustomModelData(2).setName("§8» §cKill-All").setLore("§7", "§8» §cDeaktiviert.", "§7", "§8» §7Einer für alle und alle für einen.").build());
+                        }
+                        if (challenge.getString("settings.normal-death-end").equals("true")) {
+                            inventory.setItem(11, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setLocalizedName("normal-death-end").setCustomModelData(3).setName("§8» §4Normal-Death-End").setLore("§7", "§8» §aAktiviert.", "§7", "§8» §7Ein Tod wird das ende bedeuten, egal wie er passiert.").build());
+                        }else {
+                            inventory.setItem(11, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setLocalizedName("normal-death-end").setCustomModelData(3).setName("§8» §4Normal-Death-End").setLore("§7", "§8» §cDeaktiviert.", "§7", "§8» §7Ein Tod wird das ende bedeuten, egal wie er passiert.").build());
+                        }
                         player.openInventory(inventory);
                         break;
                     case "killall":
@@ -81,6 +96,57 @@ public class InventoryListener implements Listener {
                             }
                             challenge.set("settings.kill-all", "true");
                             main.getPlugin().getConfigManager().saveCustomConfig("challenge");
+                        }
+                        break;
+                    case "normal-death-end":
+                        player.closeInventory();
+                        if (challenge.getString("settings.normal-death-end").equals("true")) {
+                            Bukkit.broadcastMessage(main.prefix + "§b" + player.getName() + " §7hat die Normal-Death-End Setting deaktiviert!");
+                            for (Player players : Bukkit.getOnlinePlayers()) {
+                                players.sendTitle("§b" + player.getName() + " §7hat die Normal-Death-End Setting deaktiviert!", "", 0, 100, 0);
+                            }
+                            challenge.set("settings.normal-death-end", "false");
+                            main.getPlugin().getConfigManager().saveCustomConfig("challenge");
+                        } else {
+                            Bukkit.broadcastMessage(main.prefix + "§b" + player.getName() + " §7hat die Normal-Death-End Setting aktiviert!");
+                            for (Player players : Bukkit.getOnlinePlayers()) {
+                                players.sendTitle("§b" + player.getName() + " §7hat die Normal-Death-End Setting aktiviert!", "", 0, 100, 0);
+                            }
+                            challenge.set("settings.normal-death-end", "true");
+                            main.getPlugin().getConfigManager().saveCustomConfig("challenge");
+                        }
+                        break;
+                    case "border":
+                        player.closeInventory();
+                        if (challenge.getString("level-border.enabled").equals("true")) {
+                            Bukkit.broadcastMessage(main.prefix + "§b" + player.getName() + " §7hat Level = Border beendet!");
+                            challenge.set("level-border.enabled", "false");
+                            challenge.set("timer.time", 0);
+                            challenge.set("level-border.blocks", 1);
+                            main.getPlugin().getLevelUpListener().worldBorder.setSize(59999968);
+                            main.getPlugin().getLevelUpListener().worldBorder_nether.setSize(59999968);
+                            main.getPlugin().getLevelUpListener().worldBorder_the_end.setSize(59999968);
+                            main.getPlugin().getConfigManager().saveCustomConfig("challenge");
+                            for (Player players : Bukkit.getOnlinePlayers()) {
+                                players.sendTitle("§b" + player.getName() + " §7hat Level = Border beendet!", "", 0, 100, 0);
+                            }
+                        } else {
+                            Bukkit.broadcastMessage(main.prefix + "§b" + player.getName() + " §7hat Level = Border gestartet!");
+                            challenge.set("level-border.enabled", "true");
+                            challenge.set("level-border.blocks", 1);
+                            challenge.set("timer.time", time);
+                            Location location = main.getPlugin().getLevelUpLocationManager().getLocationConfigByName(player.getWorld().getName());
+                            main.getPlugin().getLevelUpListener().worldBorder.setSize(1);
+                            main.getPlugin().getLevelUpListener().worldBorder_nether.setSize(1);
+                            main.getPlugin().getLevelUpListener().worldBorder_the_end.setSize(1);
+                            main.getPlugin().getConfigManager().saveCustomConfig("challenge");
+                            for (Player players : Bukkit.getOnlinePlayers()) {
+                                players.sendTitle("§b" + player.getName() + " §7hat Level = Border gestartet!", "", 0, 100, 0);
+                                players.teleport(location);
+                            }
+                            if (challenge.getString("ampel-challenge.enabled").equals("true")) {
+                                challenge.set("ampel-challenge.enabled", "false");
+                            }
                         }
                         break;
                 }
