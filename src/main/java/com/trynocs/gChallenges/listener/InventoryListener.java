@@ -75,9 +75,9 @@ public class InventoryListener implements Listener {
                             inventory.setItem(10, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setLocalizedName("killall").setCustomModelData(2).setName("§8» §cKill-All").setLore("§7", "§8» §cDeaktiviert.", "§7", "§8» §7Einer für alle und alle für einen.").build());
                         }
                         if (challenge.getString("settings.normal-death-end").equals("true")) {
-                            inventory.setItem(11, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setLocalizedName("normal-death-end").setCustomModelData(3).setName("§8» §4Normal-Death-End").setLore("§7", "§8» §aAktiviert.", "§7", "§8» §7Ein Tod wird das ende bedeuten, egal wie er passiert.").build());
+                            inventory.setItem(12, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setLocalizedName("normal-death-end").setCustomModelData(3).setName("§8» §4Normal-Death-End").setLore("§7", "§8» §aAktiviert.", "§7", "§8» §7Ein Tod wird das ende bedeuten, egal wie er passiert.").build());
                         }else {
-                            inventory.setItem(11, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setLocalizedName("normal-death-end").setCustomModelData(3).setName("§8» §4Normal-Death-End").setLore("§7", "§8» §cDeaktiviert.", "§7", "§8» §7Ein Tod wird das ende bedeuten, egal wie er passiert.").build());
+                            inventory.setItem(12, new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setLocalizedName("normal-death-end").setCustomModelData(3).setName("§8» §4Normal-Death-End").setLore("§7", "§8» §cDeaktiviert.", "§7", "§8» §7Ein Tod wird das ende bedeuten, egal wie er passiert.").build());
                         }
                         player.openInventory(inventory);
                         break;
