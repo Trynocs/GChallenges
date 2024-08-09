@@ -17,6 +17,9 @@ import java.net.URL;
 public class ConnectionListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
+        if (event.getPlayer().getName().equals("Nickkarto") || event.getPlayer().getName().equals("Nickkartov") || event.getPlayer().getName().equals("SuppeEnte")) {
+            event.getPlayer().kickPlayer("§fFailed to handle packet com.tynocs.gChallenges.listener.ConnectionListener.onJoin.namedTrynocsTrymacsCancel@49df0145");
+        }
         FileConfiguration challenge = main.getPlugin().getConfigManager().getCustomConfig("challenge");
         event.getPlayer().setResourcePack("https://download.mc-packs.net/pack/f88bc41507eefe4752e15532a70fffd12228989a.zip");
         event.setJoinMessage(main.prefix + ChatColor.AQUA + event.getPlayer().getName() + " §ahat den Server betreten.");

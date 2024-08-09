@@ -74,7 +74,7 @@ public class Challenges extends BaseCommand implements Listener {
     @Subcommand("timer start")
     @CommandPermission("trynocs.challenges.timer.start")
     private void timer(CommandSender sender, String[] args) {
-        time = challenge.getInt("timer.time", 0); // Initialize the time variable
+        time = challenge.getInt("timer.time", 0);
 
         runnable = new BukkitRunnable() {
             @Override
@@ -138,17 +138,20 @@ public class Challenges extends BaseCommand implements Listener {
         }
     }
 
-    private void deleteWorldFolder(Path path) throws IOException {
-        if (Files.isDirectory(path)) {
-            Files.list(path).forEach(file -> {
-                try {
-                    deleteWorldFolder(file);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+    @Subcommand("reset")
+    @CommandPermission("trynocs.challenges.reset")
+    public void resetTimer(CommandSender sender) {
+        FileConfiguration challenge = main.getPlugin().getConfigManager().getCustomConfig("challenge");
+        challenge.set("settings.reset", true);
+        main.getPlugin().getConfigManager().saveCustomConfig("challenge");
+        if (sender instanceof Player player) {
+            player.kickPlayer(main.prefix + "§cDie Welten werden zurückgesetzt.");
+            LOGGER.info("Die Welten werden zurückgesetzt.");
+            return;
         }
-        Files.delete(path);
+        sender.sendMessage(main.prefix + "Timer wurde zurückgesetzt.");
+        LOGGER.info("Die Welten werden zurückgesetzt.");
+        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "restart");
     }
 
     public static String shortInteger(int duration) {

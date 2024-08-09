@@ -14,6 +14,7 @@ import org.bukkit.event.player.PlayerLevelChangeEvent;
 
 public class LevelUpListener implements Listener {
     private FileConfiguration challenge = main.getPlugin().getConfigManager().getCustomConfig("challenge");
+    private Location location_nether;
     World world = Bukkit.getWorld("world");
     World world_nether = Bukkit.getWorld("world_nether");
     World world_the_end = Bukkit.getWorld("world_the_end");
@@ -49,10 +50,13 @@ public class LevelUpListener implements Listener {
                     event.getPlayer().sendMessage(main.prefix + "§aDie Border wird um 1 Block erweitert.");
                     challenge.set("level-border.blocks", challenge.getInt("level-border.blocks") + 1);
                     main.getPlugin().getConfigManager().saveCustomConfig("challenge");
-
+                    if (!challenge.isSet("level-border.world_nether")) {
+                        location_nether = world_nether.getSpawnLocation();
+                    }
                     Location location = world.getSpawnLocation();
                     Location location_the_end = new Location(world_the_end, 100.5, 49, 0.5, 90, 0);
                     setLocationConfig("world", location);
+                    setLocationConfig("world_nether", location_nether);
                     setLocationConfig("world_the_end", location_the_end);
                     worldBorder.setCenter(getLocationConfig("world"));
                     worldBorder_nether.setCenter(getLocationConfig("world_nether"));

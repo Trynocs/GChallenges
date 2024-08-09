@@ -8,6 +8,8 @@ import com.trynocs.gChallenges.utils.config.Configmanager;
 import com.trynocs.gChallenges.utils.config.LevelUpLocationManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.boss.BossBar;
 import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -16,6 +18,7 @@ import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
@@ -44,11 +47,24 @@ public final class main extends JavaPlugin {
         configManager = new Configmanager(this);
         configManager.saveDefaultConfig();
         FileConfiguration challenge = main.getPlugin().getConfigManager().getCustomConfig("challenge");
+        if (challenge.getString("settings.reset").equals("true")) {
+            for (String worldName : Bukkit.getWorlds().stream().map(World::getName).toList()) {
+                if (Bukkit.getWorld(worldName) != null) {
+                    Bukkit.unloadWorld(worldName, false);
+                }
+
+                deleteWorldFolder(Bukkit.getWorldContainer().toPath().resolve(worldName).toFile());
+            }
+            challenge.set("settings.reset", "false");
+            main.getPlugin().getConfigManager().saveCustomConfig("challenge");
+        }
         ampelChanger = new AmpelChanger(this);
         levelUpListener = new LevelUpListener();
         levelUpLocationManager = new LevelUpLocationManager();
         pluginManager = main.getPlugin().getServer().getPluginManager();
-        main.getPlugin().getLevelUpLocationManager().setLocationConfig("world", Bukkit.getWorlds().get(0).getSpawnLocation());
+        if (main.getPlugin().getServer().getWorld("world") != null) {
+            main.getPlugin().getLevelUpLocationManager().setLocationConfig("world", Bukkit.getWorlds().get(0).getSpawnLocation());
+        }
         loadConfigValues();
         registerCommands();
         pluginManager.registerEvents(new ConnectionListener(), this);
@@ -61,16 +77,33 @@ public final class main extends JavaPlugin {
             ampelChanger.setColor(main.getPlugin().getConfigManager().getCustomConfig("challenge").getString("ampel-challenge.color"));
             ampelChanger.startColorChangeTask();
         }
-        if (challenge.getString("level-border.enabled").equals("true")) {
-            levelUpListener.worldBorder.setSize(challenge.getInt("level-border.blocks"));
-            levelUpListener.worldBorder_nether.setSize(challenge.getInt("level-border.blocks"));
-            levelUpListener.worldBorder_the_end.setSize(challenge.getInt("level-border.blocks"));
+        if (challenge.getString("level-border.enabled").equals("true") && main.getPlugin().getServer().getWorld("world") != null && main.getPlugin().getServer().getWorld("world_nether") != null && main.getPlugin().getServer().getWorld("world_the_end") != null) {
+            main.getPlugin().getLevelUpListener().worldBorder.setSize(challenge.getInt("level-border.blocks"));
+            main.getPlugin().getLevelUpListener().worldBorder_nether.setSize(challenge.getInt("level-border.blocks"));
+            main.getPlugin().getLevelUpListener().worldBorder_the_end.setSize(challenge.getInt("level-border.blocks"));
         }else {
-            levelUpListener.worldBorder.setSize(59999968);
-            levelUpListener.worldBorder_nether.setSize(59999968);
-            levelUpListener.worldBorder_the_end.setSize(59999968);
+            main.getPlugin().getLevelUpListener().worldBorder.setSize(59999968);
+            main.getPlugin().getLevelUpListener().worldBorder_nether.setSize(59999968);
+            main.getPlugin().getLevelUpListener().worldBorder_the_end.setSize(59999968);
         }
         getLogger().info("Plugin wurde aktiviert.");
+    }
+
+
+    private void deleteWorldFolder(File path) {
+        if (path.exists()) {
+            File[] files = path.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        deleteWorldFolder(file);
+                    } else {
+                        file.delete();
+                    }
+                }
+            }
+            path.delete();
+        }
     }
 
     private void registerCommands() {
