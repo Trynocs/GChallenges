@@ -1,7 +1,11 @@
 package com.trynocs.gChallenges;
 
+import co.aikar.commands.CommandCompletions;
+import co.aikar.commands.PaperCommandCompletions;
 import co.aikar.commands.PaperCommandManager;
+import co.aikar.commands.annotation.Values;
 import com.trynocs.gChallenges.commands.Challenges;
+import com.trynocs.gChallenges.commands.Gamemode;
 import com.trynocs.gChallenges.listener.*;
 import com.trynocs.gChallenges.utils.challenge.AmpelChanger;
 import com.trynocs.gChallenges.utils.config.Configmanager;
@@ -17,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import co.aikar.commands.annotation.CommandCompletion;
 
 import java.io.File;
 import java.util.Iterator;
@@ -109,6 +114,14 @@ public final class main extends JavaPlugin {
     private void registerCommands() {
         Challenges challenges = new Challenges();
         commandManager.registerCommand(challenges);
+    }
+
+    private void registerCompletions() {
+        Gamemode gamemode = new Gamemode();
+        commandManager.getCommandCompletions().registerAsyncCompletion("gamemode", c -> {
+            return List.of("survival", "creative", "adventure", "spectator", "0", "1", "2", "3");
+        });
+        
     }
 
     @Override

@@ -2,12 +2,14 @@ package com.trynocs.gChallenges.listener;
 
 import com.trynocs.gChallenges.main;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -121,4 +123,17 @@ public class PauseListener implements Listener {
             event.setCancelled(true);
         }
     }
+    @EventHandler
+    public void noDamage(EntityDamageEvent event) {
+        if (challenge.getString("timer.paused").equals("true")) {
+            if (event.getEntity().hasPermission("trynocs.challenges.timer.resume")) {
+                event.getEntity().sendMessage(main.prefix + "§cDer Timer wurde pausiert. Du kannst den Timer jetzt wieder fortsetzen, indem du /challenges timer resume in den Chat schreibt.");
+            }else {
+                event.getEntity().sendMessage(main.prefix + "§cDer Timer wurde pausiert. Du musst warten bis ein Admin ihn fortsetzt.");
+            }
+            event.setCancelled(true);
+        }
+    }
+    @EventHandler
+    public void noExplosion( event) {}
 }

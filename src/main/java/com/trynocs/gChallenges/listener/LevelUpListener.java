@@ -29,6 +29,7 @@ public class LevelUpListener implements Listener {
                 if (worldBorder_nether != null) {
                     setLocationConfig("world_nether", event.getPlayer().getLocation());
                     worldBorder_nether.setCenter(event.getPlayer().getLocation());
+                    worldBorder_nether.setSize(challenge.getInt("level-border.blocks"));
                     main.getPlugin().getConfigManager().saveCustomConfig("challenge");
                 } else {
                     event.getPlayer().sendMessage(main.prefix + "§cThe Nether world is not loaded.");
@@ -46,9 +47,12 @@ public class LevelUpListener implements Listener {
                 World world_the_end = Bukkit.getWorld("world_the_end");
 
                 if (world != null && worldBorder != null && worldBorder_nether != null && worldBorder_the_end != null) {
-                    event.getPlayer().sendMessage(main.prefix + "§aDu bist nun Level " + event.getNewLevel() + "!");
-                    event.getPlayer().sendMessage(main.prefix + "§aDie Border wird um 1 Block erweitert.");
-                    challenge.set("level-border.blocks", challenge.getInt("level-border.blocks") + 1);
+                    int level = event.getNewLevel() - event.getOldLevel();
+                    event.getPlayer().sendMessage(main.prefix + "§aDu bist §6" + level + " §aLevel aufgestiegen!");
+                    if (level > 1) {
+                        event.getPlayer().sendMessage(main.prefix + "§aDie Border wird um §6" + level + " §aBlöcke erweitert.");
+                    }else event.getPlayer().sendMessage(main.prefix + "§aDie Border wird um §61 Block erweitert.");
+                    challenge.set("level-border.blocks", challenge.getInt("level-border.blocks") + level);
                     main.getPlugin().getConfigManager().saveCustomConfig("challenge");
                     if (!challenge.isSet("level-border.world_nether")) {
                         location_nether = world_nether.getSpawnLocation();
@@ -56,14 +60,18 @@ public class LevelUpListener implements Listener {
                     Location location = world.getSpawnLocation();
                     Location location_the_end = new Location(world_the_end, 100.5, 49, 0.5, 90, 0);
                     setLocationConfig("world", location);
-                    setLocationConfig("world_nether", location_nether);
+                    if (location_nether != null) {
+                        setLocationConfig("world_nether", location_nether);
+                    }
                     setLocationConfig("world_the_end", location_the_end);
                     worldBorder.setCenter(getLocationConfig("world"));
                     worldBorder_nether.setCenter(getLocationConfig("world_nether"));
                     worldBorder_the_end.setCenter(getLocationConfig("world_the_end"));
 
                     worldBorder.setSize(challenge.getInt("level-border.blocks"));
-                    worldBorder_nether.setSize(challenge.getInt("level-border.blocks"));
+                    if (location_nether != null) {
+                        worldBorder_nether.setSize(challenge.getInt("level-border.blocks"));
+                    }
                     worldBorder_the_end.setSize(challenge.getInt("level-border.blocks"));
                 } else {
                     event.getPlayer().sendMessage(main.prefix + "§cOne or more worlds are not loaded.");
