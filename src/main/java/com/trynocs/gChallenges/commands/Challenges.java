@@ -104,6 +104,7 @@ public class Challenges extends BaseCommand implements Listener {
             main.getPlugin().getConfigManager().saveCustomConfig("challenge");
             Bukkit.broadcastMessage(main.prefix + "§cTimer wurde von §5" + sender.getName() + " §cpausiert.");
             LOGGER.info("Timer wurde pausiert.");
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule mobGriefing false");
         } else {
             sender.sendMessage(main.prefix + "Der Timer läuft nicht oder wurde bereits gestoppt.");
         }
@@ -130,6 +131,7 @@ public class Challenges extends BaseCommand implements Listener {
             };
             runnable.runTaskTimer(main.getPlugin(), 0, 20);
             challenge.set("timer.paused", false);
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule mobGriefing false");
             main.getPlugin().getConfigManager().saveCustomConfig("challenge");
             Bukkit.broadcastMessage(main.prefix + "§aTimer wurde von §5" + sender.getName() + " §afortgesetzt.");
             LOGGER.info("Timer wurde fortgesetzt.");

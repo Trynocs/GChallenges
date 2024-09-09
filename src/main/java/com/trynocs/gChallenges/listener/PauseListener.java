@@ -134,6 +134,4 @@ public class PauseListener implements Listener {
             event.setCancelled(true);
         }
     }
-    @EventHandler
-    public void noExplosion( event) {}
 }

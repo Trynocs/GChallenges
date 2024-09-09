@@ -83,9 +83,9 @@ public final class main extends JavaPlugin {
             ampelChanger.startColorChangeTask();
         }
         if (challenge.getString("level-border.enabled").equals("true") && main.getPlugin().getServer().getWorld("world") != null && main.getPlugin().getServer().getWorld("world_nether") != null && main.getPlugin().getServer().getWorld("world_the_end") != null) {
-            main.getPlugin().getLevelUpListener().worldBorder.setSize(challenge.getInt("level-border.blocks"));
-            main.getPlugin().getLevelUpListener().worldBorder_nether.setSize(challenge.getInt("level-border.blocks"));
-            main.getPlugin().getLevelUpListener().worldBorder_the_end.setSize(challenge.getInt("level-border.blocks"));
+            main.getPlugin().getLevelUpListener().worldBorder.setSize(challenge.getInt("level-border.blocks"), 30);
+            main.getPlugin().getLevelUpListener().worldBorder_nether.setSize(challenge.getInt("level-border.blocks"), 30);
+            main.getPlugin().getLevelUpListener().worldBorder_the_end.setSize(challenge.getInt("level-border.blocks"), 30);
         }else {
             main.getPlugin().getLevelUpListener().worldBorder.setSize(59999968);
             main.getPlugin().getLevelUpListener().worldBorder_nether.setSize(59999968);

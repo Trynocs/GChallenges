@@ -4,4 +4,4 @@ main: com.trynocs.gChallenges.main
 api-version: '1.20'
 authors: [ Trynocs ]
 website: www.trynocs.com
-load: STARTUP
+load: POSTWORLD
